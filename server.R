@@ -21,20 +21,29 @@ colnames(data) <- c("id", "pet", "sleep", "ta.help", "raingear")
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
- 
   output$distPlot <- renderPlotly({
-    # Filter Data 
-    chart.data <- data %>% filter(as.numeric(sleep) > as.numeric(input$hours))
+    # Filter data
+    chart.data <- data %>% 
+      filter(as.numeric(sleep) > as.numeric(input$hours))
     
-    plot_ly(x = chart.data$ta.help, y = as.numeric(chart.data$sleep), type = "scatter", color = chart.data$pet) %>% 
-      layout(xaxis = list(title = "TA Help"))
-  
+    # Make chart
+    plot_ly(x = chart.data$ta.help, 
+            y = as.numeric(chart.data$sleep),
+            color = chart.data$pet,
+            type="scatter") %>% 
+      layout(xaxis=list(title="TA Help")) 
   })
   
   output$histPlot <- renderPlotly({
-    plot_ly(x = data[input$hist.var], type = "histogram") %>% 
-      layout(xaxis = list(title = input$hist.var))
-    
+    if(input$hist.var == 'sleep') {
+      chart.data <- as.numeric(data[,input$hist.var])
+    } else {
+      chart.data <- data[,input$hist.var]
+    }
+    # Make chart
+    plot_ly(x = chart.data, 
+            type="histogram") %>% 
+      layout(xaxis=list(title=input$hist.var)) 
   })
   
 })
